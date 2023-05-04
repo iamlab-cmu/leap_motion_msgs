@@ -1,0 +1,9 @@
+uint32 id
+string hand_type
+bool is_left
+float64[3] hand_position
+float64[3] hand_rotation
+float64[3] arm_direction
+float64[3] wrist_position
+float64[3] elbow_position
+Finger[5] fingers
