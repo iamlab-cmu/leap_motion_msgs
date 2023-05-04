@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   message_generation
+  std_msgs
 )
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -67,6 +68,7 @@ add_message_files(
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
+  std_msgs
 )
 
 
