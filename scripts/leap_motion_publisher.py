@@ -16,7 +16,7 @@ class SampleListener(Leap.Listener):
     finger_names = ['Thumb', 'Index', 'Middle', 'Ring', 'Pinky']
     bone_names = ['Metacarpal', 'Proximal', 'Intermediate', 'Distal']
     state_names = ['STATE_INVALID', 'STATE_START', 'STATE_UPDATE', 'STATE_END']
-    pub = rospy.Publisher('/leap_motion', LeapData, queue_size=10)
+    ros_pub = rospy.Publisher('/leap_motion', LeapData, queue_size=10)
 
     def on_init(self, controller):
         print("Initialized")
@@ -43,7 +43,7 @@ class SampleListener(Leap.Listener):
 
         leap_msg = LeapData()
         leap_msg.header.stamp = rospy.Time.now()
-        leap_msg.header.frame_id = frame.id
+        leap_msg.header.frame_id = "leap_motion"
 
         print("Frame id: %d, timestamp: %d, hands: %d, fingers: %d, tools: %d, gestures: %d" % (
               frame.id, frame.timestamp, len(frame.hands), len(frame.fingers), len(frame.tools), len(frame.gestures())))
@@ -57,19 +57,19 @@ class SampleListener(Leap.Listener):
             hand_msg.id = hand.id
             hand_msg.hand_type = handType
             hand_msg.is_left = hand.is_left
-
+            
             # Get the hand's normal vector and direction
             normal = hand.palm_normal
             direction = hand.direction
 
             # Get arm bone
             arm = hand.arm
-
+            
             for i in range(3):
                 hand_msg.hand_position[i] = hand.palm_position[i]
                 hand_msg.arm_direction[i] = hand.arm.direction[i]
-                hand_msg.wrist_position[i] = hand.wrist_position[i]
-                hand_msg.elbow_position[i] = hand.elbow_position[i]
+                hand_msg.wrist_position[i] = arm.wrist_position[i]
+                hand_msg.elbow_position[i] = arm.elbow_position[i]
 
             hand_msg.hand_rotation[0] = direction.pitch * Leap.RAD_TO_DEG
             hand_msg.hand_rotation[1] = normal.roll * Leap.RAD_TO_DEG
@@ -100,6 +100,7 @@ class SampleListener(Leap.Listener):
 
                 hand_msg.fingers[finger_num] = finger_msg
                 finger_num += 1
+            leap_msg.hands.append(hand_msg)
 
         # Get tools
         for tool in frame.tools:
@@ -149,7 +150,7 @@ class SampleListener(Leap.Listener):
         if not (frame.hands.is_empty and frame.gestures().is_empty):
             print("")
         
-        self.pub(leap_msg)
+        self.ros_pub.publish(leap_msg)
 
     def state_string(self, state):
         if state == Leap.Gesture.STATE_START:
