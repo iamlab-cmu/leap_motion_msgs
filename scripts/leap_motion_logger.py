@@ -3,8 +3,23 @@ import numpy as np
 import datetime
 import time 
 import csv
+import signal
 from leap_motion_msgs.msg import *
 import argparse 
+
+class GracefulExiter():
+
+    def __init__(self):
+        self.state = False
+        signal.signal(signal.SIGINT, self.change_state)
+
+    def change_state(self, signum, frame):
+        print("exit flag set to True (repeat to exit now)")
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
+        self.state = True
+
+    def exit(self):
+        return self.state
 
 class LeapMotionLogger:
     def __init__(self, record_data, data_save_dir):
@@ -74,6 +89,13 @@ if __name__=="__main__":
 
     rospy.init_node("leap_motion_logger")
     leap_motion_logger = LeapMotionLogger(args.record, args.save_dir)
+
+    flag = GracefulExiter()
+
     while(True):
         print(leap_motion_logger.get_curr_reading())
         time.sleep(0.033)
+
+        if flag.exit():
+            leap_motion_logger.terminateRecord()
+            break

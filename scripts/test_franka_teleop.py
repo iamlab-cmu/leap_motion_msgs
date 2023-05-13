@@ -20,7 +20,7 @@ class LeapMotionTeleop:
         self.data_array = np.zeros((21))
         self.data_record = record_data
         self.data_save_dir = data_save_dir
-        self.fa = FrankaArm()
+        self.fa = FrankaArm(with_gripper=False)
         self.pub = rospy.Publisher(FC.DEFAULT_SENSOR_PUBLISHER_TOPIC, SensorDataGroup, queue_size=1000)
         self.pub_id = 0
         self.last_delta_position = None
@@ -79,10 +79,20 @@ class LeapMotionTeleop:
                 self.stopTeleop()
             else:
                 desired_delta_pose = (self.data_array[0:6] - self.hand_start_pose) * 0.001
-                desired_delta_pose = [desired_delta_pose[2], desired_delta_pose[0], desired_delta_pose[1], desired_delta_pose[5], desired_delta_pose[3], desired_delta_pose[4]]
+                
+                print(desired_delta_pose[3:])
+                
+                desired_delta_pose = [desired_delta_pose[2], desired_delta_pose[0], desired_delta_pose[1], desired_delta_pose[3], desired_delta_pose[4], desired_delta_pose[5]]
                 delta_difference = np.clip(desired_delta_pose - self.last_delta_position, -0.02, 0.02)
                 print(desired_delta_pose)
                 timestamp = rospy.Time.now().to_time() - self.init_time
+
+                T_ee_rot = RigidTransform(
+                    rotation=RigidTransform.z_axis_rotation(np.deg2rad(self.last_delta_position[5] + delta_difference[5])),
+                    from_frame='franka_tool', to_frame='franka_tool'
+                )
+                new_transformation = self.robot_start_pose * T_ee_rot
+
                 traj_gen_proto_msg = PosePositionSensorMessage(
                     id=self.pub_id, timestamp=timestamp, 
                     position=self.robot_start_pose.translation + self.last_delta_position[0:3] + delta_difference[0:3], 
