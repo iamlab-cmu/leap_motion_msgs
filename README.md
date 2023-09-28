@@ -49,6 +49,21 @@
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/catkin_ws/src/leap_motion_msgs/Leap_Developer_Kit/LeapSDK/python3.8-project
     ```
 
+8. Make this catkin package and source the devel/setup.bash file:
+    ```bash
+    cd /path/to/catkin_ws
+    catkin_make
+    source devel/setup.bash
+    ```
+
+## Running Instructions
+
+1. Enter the scripts folder of leap_motion_msgs:
+    ```bash
+    roscd leap_motion_msgs
+    cd scripts
+    python3 leap_motion_publisher.py
+    ```
 
 ## Credits
 
