@@ -45,7 +45,8 @@
 
 7. Add the following lines to your ~/.bashrc file:
     ```bash
-    export PYTHONPATH=$PYTHONPATH:/path/to/leap_motion_msgs/Leap_Developer_Kit/LeapSDK/python3.8-project
+    export PYTHONPATH=$PYTHONPATH:/path/to/catkin_ws/src/leap_motion_msgs/Leap_Developer_Kit/LeapSDK/python3.8-project
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/catkin_ws/src/leap_motion_msgs/Leap_Developer_Kit/LeapSDK/python3.8-project
     ```
 
 
